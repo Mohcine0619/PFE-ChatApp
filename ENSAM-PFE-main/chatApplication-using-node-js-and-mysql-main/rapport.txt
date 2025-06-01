@@ -1,0 +1,520 @@
+Dédicace.
+
+Je dédie ce projet à ma famille et à mes amis pour leur soutien 
+inconditionnel tout au long de ce parcours. Leur encouragement et leur amour m'ont permis de surmonter les défis et de mener à bien ce 
+projet. Je tiens également à dédier ce travail à mes professeurs, dont 
+les enseignements et les conseils ont été inestimables.
+
+Remerciements.
+
+Je tiens à exprimer ma profonde gratitude à mes professeurs pour leurs conseils avisés et leur soutien tout au long de ce projet. Leur patience et leur expertise ont été des éléments clés dans la réussite de ce travail.
+Je remercie également mes camarades de classe pour leur aide précieuse et leurs encouragements constants. Leur collaboration et leur esprit d'équipe ont grandement contribué à l'avancement de ce projet.
+Enfin, je souhaite remercier ma famille et mes amis pour leur soutien moral et leur compréhension durant les moments difficiles. Leur présence et leurs encouragements ont été une source de motivation inestimable.
+
+Résumé.
+
+Ce projet a permis de développer une application de chat en ligne 
+complète, avec des fonctionnalités de messagerie en temps réel, de 
+gestion des utilisateurs et de personnalisation de l'interface.
+L'application utilise des technologies modernes pour offrir une
+ expérience utilisateur fluide et réactive. Les principales fonctionnalités incluent :
+•	Envoi et réception de messages en temps réel : Utilisation de 
+•	Socket.io pour la communication instantanée.
+
+•	Gestion des utilisateurs : Affichage des utilisateurs en ligne et 
+
+•	hors ligne, et mise à jour en temps réel de leur statut.
+
+•	Interface utilisateur intuitive : Utilisation de Tailwind CSS pour
+ un design moderne et responsive, et Handlebars pour le 
+templating dynamique.
+
+Ce rapport détaillera les différentes étapes du projet, les outils et 
+technologies utilisés, ainsi que les défis rencontrés et les solutions 
+apportées.
+
+Introduction.
+
+Ce projet consiste en la création d'une application de chat en ligne 
+utilisant diverses technologies web. L'objectif principal est de 
+permettre aux utilisateurs de communiquer en temps réel via une 
+interface conviviale et intuitive.
+L'application a été développée en utilisant des technologies modernes telles que HTML, CSS, JavaScript, Handlebars pour le templating, et 
+MySQL pour la gestion de la base de données. Le projet a également 
+intégré des outils comme Redis pour le stockage en cache et XAMPP pour le serveur local.
+Ce rapport détaillera les différentes étapes du projet, les problématiques rencontrées, les solutions apportées, ainsi que les outils et 
+technologies utilisés. Il inclura également une analyse des besoins, 
+des diagrammes de conception, et une description des langages et méthodes utilisés.
+
+Déroulement du projet.
+
+Le projet a été réalisé en plusieurs étapes, chacune étant cruciale pour 
+la réussite de l'application finale. Voici un aperçu détaillé du 
+déroulement du projet :
+1. Analyse des besoins : Cette première étape a consisté à identifier les besoins fonctionnels et non fonctionnels de l'application. Des 
+réunions avec les parties prenantes ont été organisées pour 
+comprendre les attentes et les exigences.
+2. Conception de l'architecture : Une fois les besoins identifiés, une
+ architecture de l'application a été conçue. Cela incluait la définition 
+des différentes couches de l'application, la base de données, et les 
+interactions entre les composants.
+3. Développement de l'interface utilisateur : L'interface utilisateur a 
+été développée en utilisant HTML, CSS, et JavaScript. Handlebars a été utilisé pour le templating afin de rendre l'interface dynamique et 
+interactive.
+4. Implémentation des fonctionnalités de chat : Les fonctionnalités de chat en temps réel ont été implémentées en utilisant Socket.io. Cela
+ permet aux utilisateurs d'envoyer et de recevoir des messages 
+instantanément.
+5. Tests et débogage : Une phase de tests rigoureux a été menée pour 
+s'assurer que toutes les fonctionnalités fonctionnent correctement. 
+Les bugs identifiés ont été corrigés pour améliorer la stabilité et la 
+performance de l'application.
+6. Documentation : Enfin, une documentation complète a été rédigée pour expliquer le fonctionnement de l'application, les technologies 
+utilisées, et les étapes de développement.
+
+
+
+
+Problématiques.
+
+
+Les principales problématiques rencontrées lors de ce projet étaient :
+1.	Gestion des connexions en temps réel : Assurer que les 
+2.	utilisateurs puissent se connecter et communiquer en temps réel sans latence
+3.	 perceptible.
+2. Synchronisation des messages : Garantir que les messages envoyés 
+par un utilisateur soient reçus instantanément par le destinataire, 
+même en cas de connexion instable et sans actualisation de la page.
+3. Gestion des utilisateurs en ligne et hors ligne : Mettre à jour l'état
+ des utilisateurs (en ligne/hors ligne) en temps réel et afficher cette
+ information de manière précise dans l'interface utilisateur.
+
+
+
+
+
+Résumé.
+
+
+Ce projet a permis de développer une application de chat en ligne 
+complète, avec des fonctionnalités de messagerie en temps réel, de 
+gestion des utilisateurs et de personnalisation de l'interface.
+L'application utilise des technologies modernes pour offrir une
+ expérience utilisateur fluide et réactive. Les principales fonctionnalités incluent :
+•	Envoi et réception de messages en temps réel : Utilisation de 
+•	Socket.io pour la communication instantanée.
+
+•	Gestion des utilisateurs : Affichage des utilisateurs en ligne et 
+
+•	hors ligne, et mise à jour en temps réel de leur statut.
+
+•	Interface utilisateur intuitive : Utilisation de Tailwind CSS pour
+ un design moderne et responsive, et Handlebars pour le 
+templating dynamique.
+
+Ce rapport détaillera les différentes étapes du projet, les outils et 
+technologies utilisés, ainsi que les défis rencontrés et les solutions 
+apportées.
+
+
+
+
+
+Analyse de conception.
+
+Diagramme de Gantt.
+Un diagramme de Gantt est un outil de gestion de projet qui permet de visualiser les différentes tâches d'un projet, leur durée et leur 
+chronologie. Il se présente sous la forme d'un graphique à barres
+ horizontales où chaque barre représente une tâche du projet. La
+ longueur de la barre indique la durée de la tâche, et la position de la 
+barre sur l'axe horizontal indique le début et la fin de la tâche. Le 
+diagramme de Gantt est utile pour planifier, coordonner et suivre les
+ tâches d'un projet, en permettant de voir d'un coup d'œil les tâches
+ en cours, les tâches terminées et les tâches à venir.
+Taches	Durée
+Analyse des besoins	4 jours
+Conception de l'architecture	4 jours
+Développement de l'interface utilisateur 	8 jours
+Recherche d'utilisateurs
+
+	1 jours
+Implémentation de la réception de messages	4 jours
+Gestion des utilisateurs en ligne
+	2 jours
+Tests et débogage	3 jours
+Documentation	4 jours
+
+
+Diagramme de cas d'utilisation.
+Un diagramme de cas d'utilisation est un outil de modélisation utilisé en ingénierie logicielle pour représenter les interactions entre les utilisateurs (ou acteurs) et le système. Il permet de visualiser les différentes fonctionnalités offertes par le système et comment les utilisateurs 
+interagissent avec ces fonctionnalités.
+ 
+Acteur :
+Utilisateur : L'acteur principal du diagramme est l'utilisateur, qui
+ interagit avec l'application de chat. L'utilisateur peut être n'importe 
+quelle personne utilisant l'application pour envoyer et recevoir des 
+messages.
+Cas d'utilisation
+Authentifier : Ce cas d'utilisation représente le processus 
+d'authentification de l'utilisateur. Il inclut les sous-cas d'utilisation suivants :
+Inscription : Permet à un nouvel utilisateur de créer un compte dans l'application.
+Connexion : Permet à un utilisateur existant de se connecter à
+ l'application.
+Déconnexion : Permet à un utilisateur connecté de se déconnecter 
+de l'application.
+Envoyer un message : Ce cas d'utilisation permet à l'utilisateur 
+d'envoyer un message à un autre utilisateur via l'application de chat.
+Recevoir un message : Ce cas d'utilisation permet à l'utilisateur de recevoir des messages envoyés par d'autres utilisateurs. Afficher les utilisateurs en ligne : Ce cas d'utilisation permet à 
+l'utilisateur de voir la liste des utilisateurs actuellement en ligne.
+Rechercher des utilisateurs : Ce cas d'utilisation permet à 
+l'utilisateur de rechercher d'autres utilisateurs dans l'application.
+Relations
+<<include>> : Les relations d'inclusion indiquent que les cas d'utilisation "Inscription", "Connexion" et "Déconnexion" sont inclus dans le cas d'utilisation "Authentifier". Cela signifie que pour authentifier un utilisateur, l'application doit inclure l'une de ces actions (inscription, 
+connexion ou déconnexion). Associations : Les lignes reliant l'acteur "Utilisateur" aux cas 
+d'utilisation indiquent les interactions possibles entre l'utilisateur et 
+les différentes fonctionnalités de l'application. Par exemple, 
+l'utilisateur peut envoyer un message, recevoir un message, afficher 
+les utilisateurs en ligne, et rechercher des utilisateurs.
+Diagramme de cas classe.
+ 
+Classes
+1. Utilisateur
+•	Attributs :
+o	id: int : Identifiant unique de l'utilisateur.
+o	username: string : Nom d'utilisateur.
+o	password: string : Mot de passe de l'utilisateur.
+Relations :Un utilisateur peut envoyer et recevoir plusieurs messages.
+2. Message
+•	Attributs :
+o	id: int : Identifiant unique du message.
+o	sender_id: int : Identifiant de l'utilisateur qui a envoyé le message.
+o	receiver_id: int : Identifiant de l'utilisateur qui a reçu le message.
+o	message: string : Contenu du message.
+o	timestamp: datetime : Date et heure d'envoi du message.
+Relations :Un message est envoyé par un utilisateur et reçu par un autre utilisateur.
+3. Socket
+•	Méthodes :
+o	initializeSocket() : Initialise la connexion socket.
+o	sendMessage() : Envoie un message via la connexion socket.
+o	receiveMessage() : Reçoit un message via la connexion socket.
+o	updateOnlineUsers() : Met à jour la liste des utilisateurs en ligne
+4. ChatController
+•	Méthodes :
+o	getHomePage(req, res) : Récupère la page d'accueil du chat.
+o	getMessages(req, res) : Récupère les messages pour un utilisateur donné.
+o	sendMessage(req, res) : Envoie un message.
+5. AuthController
+•	Méthodes :
+o	register(req, res) : Inscrit un nouvel utilisateur.
+o	login(req, res) : Connecte un utilisateur existant.
+o	logout(req, res) : Déconnecte un utilisateur.
+6. Database
+•	Méthodes :
+o	query(sql: string, params: array, callback: function) : Exécute une requête SQL sur la base de données.
+Relations :
+•	Utilisateur - Message :
+Un utilisateur peut envoyer (envoie) et recevoir (reçoit) plusieurs messages. La relation est représentée par une association avec une multiplicité de 1 pour l'utilisateur et 0..* pour les messages.
+•	Socket - Utilisateur :
+La classe Socket interagit avec la classe Utilisateur pour gérer les connexions et les messages en temps réel.
+•	Socket - Message :
+La classe Socket interagit avec la classe Message pour envoyer et recevoir des messages.
+•	ChatController - Database :
+La classe ChatController utilise la classe Database pour exécuter des requêtes SQL liées aux messages.
+•	AuthController - Database :
+La classe AuthController utilise la classe Database pour exécuter des requêtes SQL liées à l'authentification des utilisateurs.
+Les interfaces utilisateurs.
+1.	Interface d’inscription.
+ 
+
+L'interface d'inscription permet aux nouveaux utilisateurs de créer un compte dans l'application de chat en ligne. Voici une description 
+détaillée des éléments de cette interface :
+1. Champ "Username" :
+
+Ce champ permet à l'utilisateur de saisir son nom d'utilisateur. Le 
+nom d'utilisateur doit être unique et sera utilisé pour identifier 
+l'utilisateur dans l'application.
+2. Champ "Password" :
+ Ce champ permet à l'utilisateur de saisir son mot de passe. Le mot de passe doit être sécurisé et sera utilisé pour authentifier l'utilisateur lors de la connexion.
+     3. Bouton "Register" :
+ En cliquant sur ce bouton, l'utilisateur soumet les informations saisies (nom d'utilisateur et mot de passe) pour créer un nouveau compte.
+ Si les informations sont valides, le compte est créé et l'utilisateur est redirigé vers l'interface de connexion ou directement connecté à l'application.
+4.	Lien "Login" :
+
+Ce lien permet aux utilisateurs qui ont déjà un compte de naviguer vers l'interface de connexion. En cliquant sur ce lien, l'utilisateur est redirigé vers la page de connexion où il peut entrer ses informations de connexion pour accéder à l'application.
+
+2.	Interface de connexion.
+ 
+
+L'interface de connexion permet aux utilisateurs existants de se connecter à l'application de chat en ligne. Voici une description détaillée des éléments de cette interface :
+1.	Champ "Username" :
+  Ce champ permet à l'utilisateur de saisir son nom d'utilisateur. Le nom d'utilisateur doit correspondre à celui utilisé lors de l'inscription.
+2.	Champ "Password" :
+ Ce champ permet à l'utilisateur de saisir son mot de passe. Le mot de passe doit correspondre à celui utilisé lors de l'inscription.
+3.	Bouton "Login" :
+ En cliquant sur ce bouton, l'utilisateur soumet les informations saisies (nom d'utilisateur et mot de passe) pour se connecter à l'application. Si les informations sont correctes, l'utilisateur est redirigé vers l'interface chat.
+4.	Lien "Register" :
+  Ce lien permet aux nouveaux utilisateurs de naviguer vers l'interface d'inscription. En cliquant sur ce lien, l'utilisateur est redirigé vers la page d'inscription où il peut créer un nouveau compte.
+
+3.	Interface de déconnexion.
+ 
+L'interface de déconnexion permet aux utilisateurs de se déconnecter de l'application de chat en ligne. Voici une description détaillée des éléments de cette interface :
+Bouton "Logout" :
+•	Ce bouton permet à l'utilisateur de se déconnecter de l'application. En cliquant sur ce bouton, l'utilisateur est redirigé vers la page de connexion et sa session est terminée.
+Fonctionnalités :
+•	Terminaison de la Session : Lorsque l'utilisateur clique sur le bouton "Logout", une requête est envoyée au serveur pour terminer la session de l'utilisateur. Cela implique généralement la suppression des informations de session stockées sur le serveur (par exemple, dans Redis) et la suppression des cookies de session du navigateur de l'utilisateur.
+•	Redirection vers la Page de Connexion : Après la déconnexion, l'utilisateur est redirigé vers l'interface de connexion. Cela permet à l'utilisateur de se reconnecter avec un autre compte ou de quitter l'application en toute sécurité.
+•	Mise à Jour de l'État en Ligne : La déconnexion met également à jour l'état de l'utilisateur pour indiquer qu'il est hors ligne. Cela peut impliquer la mise à jour de la liste des utilisateurs en ligne affichée aux autres utilisateurs de l'application.
+4.	Interface de recherche.
+
+
+ 
+L'image ci-dessus montre l'interface de recherche et la liste des utilisateurs de l'application de chat en ligne. On va détailler les différents éléments de cette interface par la suite:
+Éléments de l'Interface :
+•	Titre "Users" :
+ Le titre "Users" indique que cette section de l'interface est dédiée à la gestion des utilisateurs.
+•	Barre de Recherche :
+La barre de recherche permet aux utilisateurs de rechercher d'autres utilisateurs dans l'application. Les utilisateurs peuvent taper un nom d'utilisateur dans cette barre pour filtrer la liste des utilisateurs affichés en dessous.
+•	Liste des Utilisateurs :
+ La liste des utilisateurs affiche tous les utilisateurs de l'application. Chaque utilisateur est représenté par une carte contenant les éléments suivants :
+•	Avatar : 
+Une image représentant l'utilisateur. Dans cet exemple, des avatars générés aléatoirement sont utilisés.
+ 
+https://api.multiavatar.com/{{this.id}}.svg est l'URL du service Multiavatar qui génère un avatar unique en fonction de l'ID de l'utilisateur ({{this.id}}).
+
+•	Nom d'Utilisateur : 
+Le nom d'utilisateur de l'utilisateur. Le nom d'utilisateur est cliquable, permettant de sélectionner l'utilisateur pour démarrer une conversation.
+•	Statut en Ligne : 
+Un indicateur de statut en ligne. Un point vert indique que l'utilisateur est en ligne, tandis qu'un point gris indique que l'utilisateur est hors ligne.
+Fonctionnalités
+•	Recherche d'Utilisateurs :
+Les utilisateurs peuvent taper un nom d'utilisateur dans la barre de recherche pour filtrer la liste des utilisateurs. La liste se met à jour en temps réel pour afficher uniquement les utilisateurs dont le nom correspond au terme de recherche.
+•	Affichage des Utilisateurs en Ligne et Hors Ligne :
+La liste des utilisateurs affiche le statut en ligne de chaque utilisateur. Les utilisateurs en ligne sont indiqués par un point vert, tandis que les utilisateurs hors ligne sont indiqués par un point gris. Cela permet aux utilisateurs de voir rapidement qui est disponible pour discuter.
+•	Sélection d'un Utilisateur :
+En cliquant sur le nom d'un utilisateur dans la liste, l'utilisateur peut sélectionner cet utilisateur pour démarrer une conversation. Cela peut rediriger l'utilisateur vers l'interface de chat où il peut envoyer et recevoir des messages avec l'utilisateur sélectionné.
+
+5.	Interface de conversation.
+
+ 
+
+
+L'image ci-dessus montre l'interface de chat de l'application de chat en ligne. Voici une explication détaillée des différents éléments de cette interface :
+Éléments de l'Interface :
+•	Titre "Chat with: [Nom de l'utilisateur]" :
+Le titre indique avec quel utilisateur vous êtes en train de discuter. Dans cet exemple, l'utilisateur discute avec "Miage".
+•	Zone de Messages :
+La zone de messages affiche l'historique des messages échangés avec l'utilisateur sélectionné. Chaque message est affiché dans une bulle de message.
+•	Bulle de Message :
+Chaque message est affiché dans une bulle de message. Les messages envoyés par l'utilisateur actuel sont alignés à droite et ont un fond bleu, tandis que les messages reçus sont alignés à gauche et ont un fond gris.
+•	Zone de Saisie de Message :
+La zone de saisie de message permet à l'utilisateur de taper un nouveau message. Elle comprend un champ de texte et un bouton "Send".
+Fonctionnalités
+1.	Affichage des Messages :
+Les messages sont affichés dans la zone de messages avec un style différent pour les messages envoyés et reçus. Les messages envoyés par l'utilisateur actuel sont alignés à droite et ont un fond bleu, tandis que les messages reçus sont alignés à gauche et ont un fond gris.
+2.	Envoi de Messages :
+L'utilisateur peut taper un message dans la zone de saisie de message et cliquer sur le bouton "Send" pour envoyer le message. Le message est alors ajouté à la zone de messages et envoyé au serveur via Socket.io.
+3.	Affichage de l'Heure :
+Chaque message affiche également l'heure à laquelle il a été envoyé. L'heure est affichée en bas à droite de chaque bulle de message.
+
+Quand l’expéditeur envoie un message le terminal affiche le message :
+ 
+•	sender : Le nom d'utilisateur de l'expéditeur du message. Dans ce cas, c'est "Mohcine07".
+•	senderId : L'ID de l'utilisateur qui a envoyé le message. Ici, c'est "1".
+•	receiverId : L'ID de l'utilisateur qui doit recevoir le message. Ici, c'est "31" = Miage dans la base de donnée.
+•	message : Le contenu du message. Ici, c'est "bonjour".
+•	timestamp : L'horodatage indiquant quand le message a été envoyé. Ici, c'est "2024-07-07T15:04:17.601Z".
+Pourquoi Afficher ce Message dans le Terminal ?
+Afficher ce message dans le terminal est une pratique courante pour plusieurs raisons :
+1.	Débogage :
+Afficher les messages dans le terminal permet de vérifier que les messages sont correctement envoyés et reçus par le serveur. Cela aide à identifier et résoudre les problèmes potentiels dans le flux de données.
+2.	Vérification des Données :
+En affichant les détails du message, vous pouvez vérifier que toutes les informations nécessaires (comme l'ID de l'expéditeur, l'ID du destinataire, le contenu du message et l'horodatage) sont correctement transmises.
+3.	Suivi des Événements :
+Cela permet de suivre les événements en temps réel et de s'assurer que le serveur traite correctement les messages. Vous pouvez voir immédiatement quand un message est reçu et quelles données il contient.
+4.	Assurance de la Communication :
+En affichant les messages dans le terminal, vous pouvez vous assurer que la communication entre le client et le serveur fonctionne comme prévu. Cela inclut la vérification que les messages sont bien transmis via Socket.io.
+6.	Interface d’acceuil.
+
+ 
+L'image montre l'interface d’accueil de l'application de chat en ligne.
+Éléments de l'Interface
+1.	Message de Bienvenue :
+ Le message de bienvenue affiche le nom d'utilisateur de l'utilisateur connecté. Dans cet exemple, le message est "Welcome, Mohcine07".
+2.	Liste des Utilisateurs :
+La liste des utilisateurs affiche tous les utilisateurs disponibles pour discuter. Chaque utilisateur est représenté par une carte contenant un avatar, un nom d'utilisateur et un indicateur de statut en ligne.
+3.	Message de Sélection d'Utilisateur :
+Si aucun utilisateur n'est sélectionné, un message est affiché pour inviter l'utilisateur à choisir quelqu'un avec qui discuter. Dans cet exemple, le message est "Welcome, Mohcine07! Please choose someone to talk to."
+4.	Bouton de Mode Sombre :
+ Le bouton "Toggle Dark Mode" permet à l'utilisateur de basculer entre le mode clair et le mode sombre.
+5.	Bouton de Déconnexion :
+ Le lien "Logout" permet à l'utilisateur de se déconnecter de l'application.
+Fonctionnalités
+•	Message de Bienvenue :
+Le message de bienvenue est dynamique et affiche le nom d'utilisateur de l'utilisateur connecté. Cela personnalise l'expérience utilisateur et confirme que l'utilisateur est bien connecté.
+•	Message de Sélection d'Utilisateur :
+Si aucun utilisateur n'est sélectionné, un message est affiché pour inviter l'utilisateur à choisir quelqu'un avec qui discuter. Cela guide l'utilisateur sur la prochaine action à effectuer.
+•	Mode Sombre :
+Le bouton "Toggle Dark Mode" permet à l'utilisateur de basculer entre le mode clair et le mode sombre. Cela améliore l'accessibilité et le confort visuel, surtout dans des environnements à faible luminosité.
+ 
+
+Ce code permet de basculer entre le mode clair et le mode sombre en ajoutant ou supprimant la classe dark sur l'élément racine du document (<html>). Le bouton "Toggle Dark Mode" appelle la fonction toggleDarkMode pour effectuer ce changement.
+
+
+
+
+
+Les dépendances utilisés.
+1.	Initialiser un projet Node.js :
+ 
+Cette commande crée un fichier package.json avec les valeurs par défaut, qui est nécessaire pour gérer les dépendances et les scripts de votre projet.
+2.	Express :
+ 
+Express est un framework web minimaliste pour Node.js, utilisé pour créer des applications web et des API. Il est léger, flexible et dispose d'une large communauté, ce qui facilite le développement rapide et efficace de l'application backend.
+3.	Http :
+Le module http est intégré à Node.js et n'a pas besoin d'être installé séparément. Il est utilisé pour créer un serveur HTTP, ce qui est fondamental pour toute application web.
+
+4.	Socket.io :
+ 
+Socket.io permet la communication en temps réel entre le client et le serveur, ce qui est essentiel pour les applications de chat. Il gère les connexions WebSocket et les fallback HTTP, assurant une communication fluide et réactive.
+
+5.	Express-session :
+
+ 
+
+Ce middleware gère les sessions utilisateur, ce qui est crucial pour l'authentification et la gestion des sessions. Il permet de stocker les informations de session côté serveur, offrant ainsi une sécurité accrue.
+
+6.	Body-parser :
+
+ 
+
+Body-parser est un middleware qui permet de parser les corps des requêtes HTTP, facilitant ainsi l'accès aux données envoyées par les clients. Il est particulièrement utile pour traiter les formulaires et les requêtes JSON.
+
+
+7.	MySQL :
+
+ 
+
+Ce package permet de se connecter et d'interagir avec une base de données MySQL depuis Node.js. MySQL est un système de gestion de base de données relationnelle robuste et performant, idéal pour stocker les informations des utilisateurs et les messages.
+
+8.	Bcrypt :
+
+ 
+
+Bcrypt est utilisé pour hacher les mots de passe, ajoutant une couche de sécurité à l'authentification des utilisateurs. Il rend les mots de passe plus difficiles à déchiffrer en cas de fuite de données.
+
+9.	Redis :
+
+Ref : https://redis.io/downloads/
+
+Comment lancer le server :
+Acceder  dans le cmd à : cd C:\Redis\Redis-x64-3.0.504
+Et taper commande : redis-server
+
+
+Redis est utilisé comme magasin de données en mémoire, souvent pour stocker les sessions utilisateur et les données temporaires. Il offre des performances élevées et une faible latence, ce qui est crucial pour les applications en temps réel.
+
+10.	Connect-redis :
+
+ 
+
+Ce middleware permet de stocker les sessions Express dans Redis, améliorant ainsi la performance et la scalabilité. Il combine les avantages de Redis et d'Express-session pour une gestion efficace des sessions.
+
+11.	Express-handlebars :
+
+ 
+
+Express-handlebars est un moteur de template pour Express, utilisé pour générer des pages HTML dynamiques. Il permet de séparer la logique de présentation de la logique métier, facilitant ainsi le développement et la maintenance de l'interface utilisateur.
+
+12.	Conclusion.
+
+Ces dépendances ont été choisies spécifiquement pour ce projet de chat en temps réel en raison de leurs fonctionnalités, de leurs performances et de leur sécurité. Elles couvrent les besoins de base en matière de serveur web, de communication en temps réel, de gestion des sessions, de sécurité, et de génération de pages dynamiques. En utilisant ces outils, vous pouvez créer une application de chat robuste, performante et sécurisée.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Les logiciles et languages utilisés.
+
+Pour ce projet de chat en temps réel, plusieurs technologies et langages ont été utilisés pour assurer une gestion efficace et sécurisée des données, ainsi qu'une interface utilisateur réactive et intuitive. Voici un résumé des principaux logiciels et langages utilisés :
+Backend :
+1.	Node.js :
+o	Rôle : Environnement d'exécution JavaScript côté serveur.
+2.	 Express :
+o	Rôle : Framework web pour Node.js, utilisé pour créer des applications web et des API.
+3.	Socket.io :
+o	Rôle : Bibliothèque pour la communication en temps réel entre le client et le serveur.
+4.	MySQL :
+o	  Rôle : Système de gestion de base de données relationnelle pour le stockage des informations.
+5.	  Handlebars :
+o	  Rôle : Moteur de template pour générer des pages HTML dynamiques.
+
+
+Frontend :
+
+1.	HTML :
+o	Rôle : Langage de balisage pour structurer le contenu des pages web.
+2.	CSS :
+o	Rôle : Langage de style pour décrire la présentation des documents HTML.
+3.	  JavaScript :
+o	  Rôle : Langage de programmation pour ajouter des fonctionnalités interactives aux pages web.
+4.	  TailwindCSS :
+o	 Rôle : Framework CSS utilitaire pour créer des interfaces utilisateur rapidement.
+Outils et Bibliothèques :
+1.	npm :
+o	  Rôle : Gestionnaire de paquets pour Node.js, utilisé pour installer les dépendances du projet.
+2.	 Draw.io :
+o	Rôle : Outil pour créer des diagrammes UML.
+
+
+References.
+En conclusion, ce projet a permis de développer une solution complète et intégrée pour la communication en temps réel entre utilisateurs. Grâce à l'utilisation de technologies modernes telles que MySQL, Node.js, HTML, CSS et JavaScript, nous avons pu créer un système efficace et sécurisé pour la gestion des utilisateurs et des messages. Les différentes étapes du projet, de l'étude analytique à l'implémentation, ont été réalisées avec succès, permettant ainsi d'améliorer l'efficacité et la transparence de la communication en temps réel.
+
+1. Documentation MySQL : https://dev.mysql.com/doc/
+2. Documentation Node.js : https://nodejs.org/en/docs/
+3.Express : https://expressjs.com/en/starter/installing.html
+4. Documentation HTML : https://developer.mozilla.org/en-US/docs/Web/HTML
+5. Documentation CSS : https://developer.mozilla.org/en-US/docs/Web/CSS
+6. Documentation JavaScript : https://developer.mozilla.org/en-US/docs/Web/JavaScript
+7. UML : draw.io (diagrams.net)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Conclusion.
+En conclusion, ce projet de chat en temps réel démontre l'efficacité de l'utilisation combinée de technologies modernes pour créer une application web robuste et performante. Les différentes étapes de l'implémentation, de la configuration du serveur à la création de l'interface utilisateur, ont été réalisées avec succès, offrant ainsi une solution complète et intégrée pour la communication instantanée entre utilisateurs. Ce projet constitue une base solide pour des développements futurs et des améliorations continues.

@@ -1,0 +1,16 @@
+<script>
+    // Configuration de Tailwind pour le mode sombre
+    tailwind.config = {
+      darkMode: 'class',
+    };
+  
+    // Fonction pour basculer entre le mode clair et le mode sombre
+    function toggleDarkMode() {
+      document.documentElement.classList.toggle('dark');
+    }
+  
+    document.addEventListener('DOMContentLoaded', () => {
+      // Ajout de l'événement de clic pour le bouton de mode sombre
+      document.getElementById('toggleDarkModeButton').addEventListener('click', toggleDarkMode);
+    });
+  </script>

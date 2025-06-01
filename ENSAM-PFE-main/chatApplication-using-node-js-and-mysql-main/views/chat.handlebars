@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    };
+
+    let socket;
+    let selectedRecipient = null; // To store either selected user or group
+    let isGroupChat = false; // Flag to indicate if current chat is a group chat
+
+    const userId = '{{user.id}}'; // Get user ID from server-side template
+    const username = '{{user.username}}'; // Get username from server-side template
+
+    // Store user ID and username in localStorage when page loads
+    if (userId) {
+      localStorage.setItem('userId', userId);
+      localStorage.setItem('username', username);
+    }
+
+    function initializeSocket() {
+      const storedUserId = localStorage.getItem('userId');
+      console.log('Initializing socket with user ID:', storedUserId);
+
+      socket = io({
+        query: {
+          userId: storedUserId
+        }
+      });
+
+      socket.on('connect', () => {
+        console.log('Socket connected');
+        if (storedUserId) {
+          socket.emit('storeSocketId', storedUserId);
+          localStorage.setItem('socketId', socket.id);
+        }
+      });
+
+      socket.on('receiveMessage', (data) => {
+        console.log('Received message:', data);
+        const currentUserId = localStorage.getItem('userId');
+
+        // Determine if the message is for the currently selected chat
+        let isMessageForSelectedChat = false;
+        if (selectedRecipient) {
+          if (data.isGroupMessage && isGroupChat && data.receiverId == selectedRecipient.id) {
+            isMessageForSelectedChat = true;
+          } 
+          // For direct messages, check if the message is to or from the currently selected user
+          // Ensure the message is for the current user AND from/to the selected recipient.
+          else if (!data.isGroupMessage && !isGroupChat) {
+             const isCurrentUserReceiver = String(data.receiverId) === String(currentUserId);
+             const isCurrentUserSender = String(data.senderId) === String(currentUserId);
+             const isSelectedRecipient = selectedRecipient && (String(data.senderId) === String(selectedRecipient.id) || String(data.receiverId) === String(selectedRecipient.id));
+
+             // Display message if current user is receiver and sender is selected recipient,
+             // OR if current user is sender and receiver is selected recipient.
+             if (isSelectedRecipient && ( (isCurrentUserReceiver && String(data.senderId) === String(selectedRecipient.id)) || (isCurrentUserSender && String(data.receiverId) === String(selectedRecipient.id)) ) ) {
+                isMessageForSelectedChat = true;
+             }
+          }
+        }
+
+        // If the message is for the selected chat AND it's not from the current user (to prevent sender duplication)
+        if (isMessageForSelectedChat && String(data.senderId) !== String(currentUserId)) {
+           displayMessage(data);
+        }
+      });
+
+      socket.on('updateOnlineUsers', updateOnlineUsers);
+    }
+
+    function updateOnlineUsers(onlineUsersData) {
+        console.log('Online users:', onlineUsersData);
+        onlineUsers = onlineUsersData; // Update the onlineUsers object
+        // Update user online status indicators in the list
+        document.querySelectorAll('.user-item').forEach(el => {
+          const userId = el.querySelector('.user-status').dataset.userId;
+          const statusText = el.querySelector('.text-xs.text-gray-500');
+          const isOnline = onlineUsers[userId];
+
+          if (isOnline) {
+            el.querySelector('.user-status').classList.add('bg-green-500');
+            el.querySelector('.user-status').classList.remove('bg-gray-500');
+            if (statusText) {
+              statusText.textContent = 'Online';
+            }
+          } else {
+            el.querySelector('.user-status').classList.add('bg-gray-500');
+            el.querySelector('.user-status').classList.remove('bg-green-500');
+            if (statusText) {
+              statusText.textContent = 'Offline';
+            }
+          }
+        });
+
+        // Update status in the chat header if the selected recipient is a user
+        if (selectedRecipient && !isGroupChat) {
+            const selectedUserId = selectedRecipient.id;
+            const chatHeaderStatus = document.getElementById('chatRecipientStatus');
+            if (onlineUsers[selectedUserId]) {
+                 if (chatHeaderStatus) {
+                    chatHeaderStatus.textContent = 'Online';
+                 }
+            } else {
+                 if (chatHeaderStatus) {
+                    chatHeaderStatus.textContent = 'Offline';
+                 }
+            }
+        }
+        // Note: Group online status is not implemented in this simple version
+    }
+
+    function sendMessage() {
+      const messageInput = document.getElementById('message');
+      const message = messageInput.value;
+      const userId = localStorage.getItem('userId');
+      const username = localStorage.getItem('username');
+      const timestamp = new Date().toISOString();
+
+      if (selectedRecipient && message) {
+        const messageData = {
+          sender: username,
+          senderId: userId,
+          message: message,
+          timestamp: timestamp
+        };
+
+        if (isGroupChat) {
+          messageData.receiverId = selectedRecipient.id; // Group ID
+          messageData.isGroupMessage = true;
+          messageData.groupName = selectedRecipient.name; // Group name for display (optional)
+
+          // Emit group message to server for broadcasting and saving
+          socket.emit('sendMessage', messageData);
+
+           // Display the sent group message immediately on sender's UI
+           displayMessage(messageData);
+
+        } else {
+          messageData.receiverId = selectedRecipient.id; // User ID
+          messageData.isGroupMessage = false;
+
+           // Emit direct message to server for broadcasting and saving
+          socket.emit('sendMessage', messageData);
+
+          // Direct messages are saved and broadcast by the server. 
+          // The sender's UI displays immediately via the displayMessage call below.
+          // The recipient's UI displays via the receiveMessage handler.
+
+           // Display the sent direct message immediately on sender's UI
+           displayMessage(messageData);
+        }
+
+        messageInput.value = '';
+      } else {
+        alert('Please select a recipient and enter a message.');
+      }
+    }
+
+    function displayMessage(data) {
+        const messageList = document.getElementById('messages');
+        const currentUserId = localStorage.getItem('userId');
+        const messageItem = document.createElement('li');
+        messageItem.classList.add('p-4', 'rounded-lg', 'mb-2', 'max-w-xs', 'break-words', 'shadow-md', 'transition', 'transform', 'hover:scale-105');
+
+        if (String(data.senderId) === String(currentUserId)) {
+            messageItem.classList.add('bg-blue-500', 'text-white', 'self-end', 'ml-auto');
+            messageItem.innerHTML = `<div>${data.message}</div><div class="text-xs text-gray-200">${data.sender}</div>`;
+        } else {
+            messageItem.classList.add('bg-gray-200', 'text-black', 'self-start', 'mr-auto', 'dark:bg-gray-700', 'dark:text-white');
+            messageItem.innerHTML = `<div>${data.message}</div><div class="text-xs text-gray-500">${data.sender}</div>`;
+        }
+
+        messageList.appendChild(messageItem);
+        messageList.scrollTop = messageList.scrollHeight; // Scroll to bottom
+    }
+
+    function selectUser(userId, username) {
+      isGroupChat = false;
+      selectedRecipient = { id: userId, name: username };
+
+      const loggedInUserId = localStorage.getItem('userId');
+      // Update chat header
+      document.getElementById('chatRecipientAvatar').src = `https://api.dicebear.com/7.x/bottts/svg?seed=${username}`;
+      document.getElementById('chatRecipientName').textContent = (String(userId) === String(loggedInUserId)) ? `Me (${username})` : username;
+      // Initial status - will be updated by socket event if user is online
+      document.getElementById('chatRecipientStatus').textContent = 'Offline'; // Set initial status to Offline
+
+      document.getElementById('receiverId').value = userId; // Still needed for sending messages
+
+      document.getElementById('welcomeMessage').classList.add('hidden');
+      document.getElementById('chatContainer').classList.remove('hidden');
+      localStorage.setItem('selectedUser', JSON.stringify({ userId, username }));
+      localStorage.removeItem('selectedGroup'); // Clear selected group
+
+      // Fetch messages for the selected user
+      fetch(`/chat/messages/${userId}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(messages => {
+          console.log('Fetched messages:', messages);
+          const messageList = document.getElementById('messages');
+          messageList.innerHTML = ''; // Clear existing messages
+          const currentUserId = localStorage.getItem('userId');
+          messages.forEach(message => {
+            const messageItem = document.createElement('li');
+            messageItem.classList.add('p-4', 'rounded-lg', 'mb-2', 'max-w-xs', 'break-words', 'shadow-md', 'transition', 'transform', 'hover:scale-105');
+
+            if (String(message.sender_id) === String(currentUserId)) {
+              messageItem.classList.add('bg-blue-500', 'text-white', 'self-end', 'ml-auto');
+            } else {
+              messageItem.classList.add('bg-gray-200', 'text-black', 'self-start', 'mr-auto', 'dark:bg-gray-700', 'dark:text-white');
+            }
+            const timestamp = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            // For direct messages, sender name is not explicitly shown in the message bubble in the original template
+            // messageItem.innerHTML = `<div>${message.message}</div><div class="text-xs text-gray-500 dark:text-gray-400">${timestamp}</div>`;
+             messageItem.innerHTML = `<div>${message.message}</div><div class="text-xs text-gray-500 dark:text-gray-400">${timestamp}</div>`;
+            messageList.appendChild(messageItem);
+          });
+           messageList.scrollTop = messageList.scrollHeight; // Scroll to bottom
+        })
+        .catch(error => console.error('Error fetching messages:', error));
+    }
+
+    function selectGroup(groupId, groupName) {
+      isGroupChat = true;
+      selectedRecipient = { id: groupId, name: groupName };
+
+      // Update chat header for group
+      document.getElementById('chatRecipientAvatar').src = `https://api.dicebear.com/7.x/bottts/svg?seed=${groupId}`;
+      document.getElementById('chatRecipientName').textContent = groupName;
+      document.getElementById('chatRecipientStatus').textContent = 'Group'; // Set a default status like "Group"
+
+      document.getElementById('receiverId').value = groupId; // Still needed for sending messages
+
+      document.getElementById('welcomeMessage').classList.add('hidden');
+      document.getElementById('chatContainer').classList.remove('hidden');
+      localStorage.setItem('selectedGroup', JSON.stringify({ groupId, groupName }));
+      localStorage.removeItem('selectedUser'); // Clear selected user
+
+      const messageList = document.getElementById('messages');
+      messageList.innerHTML = ''; // Clear existing messages
+
+      // Fetch messages for the selected group
+      fetch(`/chat/groups/${groupId}/messages`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(messages => {
+          console.log('Fetched group messages:', messages);
+          messages.forEach(message => {
+             // Display each fetched message using the displayMessage function
+              displayMessage({ 
+                  sender: message.sender_name || message.sender, // Use sender_name from DB if available
+                  senderId: message.sender_id,
+                  receiverId: message.group_id, // This is group_id for group messages
+                  message: message.message,
+                  // Ensure timestamp is in a format displayMessage can handle (e.g., Date object or string)
+                  timestamp: new Date(message.sent_at), // Assuming sent_at is a valid date string
+                  isGroupMessage: true
+              });
+          });
+           messageList.scrollTop = messageList.scrollHeight; // Scroll to bottom
+        })
+        .catch(error => {
+            console.error('Error fetching group messages:', error);
+             // Add a placeholder message if fetching fails or no messages
+            const placeholderItem = document.createElement('li');
+            placeholderItem.classList.add('p-4', 'rounded-lg', 'mb-2', 'max-w-xs', 'break-words', 'shadow-md', 'transition', 'transform', 'hover:scale-105', 'bg-gray-200', 'text-black', 'self-start', 'mr-auto', 'dark:bg-gray-700', 'dark:text-white');
+            placeholderItem.innerHTML = '<div>Start chatting in this group! (Message history not yet available or failed to load)</div>';
+            messageList.appendChild(placeholderItem);
+        });
+    }
+
+     function loadSelectedRecipient() {
+      try {
+        const selectedUserString = localStorage.getItem('selectedUser');
+        const selectedGroupString = localStorage.getItem('selectedGroup');
+        let loaded = false;
+
+        if (selectedUserString) {
+          const selectedUser = JSON.parse(selectedUserString);
+          if (selectedUser && selectedUser.userId && selectedUser.username) {
+            selectUser(selectedUser.userId, selectedUser.username);
+            loaded = true;
+          } else {
+             localStorage.removeItem('selectedUser'); // Clear invalid user data
+             console.error('Invalid selectedUser data in localStorage. Cleared.');
+          }
+        }
+
+        if (!loaded && selectedGroupString) {
+           const selectedGroup = JSON.parse(selectedGroupString);
+           if(selectedGroup && selectedGroup.groupId && selectedGroup.groupName) {
+               selectGroup(selectedGroup.groupId, selectedGroup.groupName);
+               loaded = true;
+           } else {
+               localStorage.removeItem('selectedGroup'); // Clear invalid group data
+               console.error('Invalid selectedGroup data in localStorage. Cleared.');
+           }
+        }
+
+      } catch (e) {
+        console.error('Error loading selected recipient from localStorage. Clearing data.', e);
+        localStorage.removeItem('selectedUser');
+        localStorage.removeItem('selectedGroup');
+      }
+
+      const userId = '{{user.id}}';
+      const username = '{{user.username}}';
+      if (userId && username) {
+         localStorage.setItem('userId', userId);
+         localStorage.setItem('username', username);
+      }
+    }
+
+    window.onload = () => {
+      loadSelectedRecipient();
+      initializeSocket();
+    };
+
+    function toggleDarkMode() {
+      document.documentElement.classList.toggle('dark');
+    }
+
+    function searchUsers() {
+      const searchTerm = document.getElementById('searchUser').value.toLowerCase();
+      document.querySelectorAll('.user-item').forEach(item => {
+        const username = item.querySelector('.user-name').textContent.toLowerCase();
+        if (username.includes(searchTerm)) {
+          item.style.display = '';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+
+     function showCreateGroupModal() {
+      document.getElementById('createGroupModal').classList.remove('hidden');
+    }
+
+    function hideCreateGroupModal() {
+      document.getElementById('createGroupModal').classList.add('hidden');
+    }
+
+    function createGroup() {
+      const groupName = document.getElementById('groupName').value;
+      if (!groupName) {
+        alert('Please enter a group name');
+        return;
+      }
+
+      const selectedMembers = Array.from(document.querySelectorAll('#createGroupModal input[type="checkbox"]:checked'))
+        .map(checkbox => checkbox.value);
+
+      // Add the current user to the selected members list if not already there
+      const currentUserId = localStorage.getItem('userId');
+      if (!selectedMembers.includes(currentUserId)) {
+          selectedMembers.push(currentUserId);
+      }
+
+      fetch('/chat/groups', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: groupName,
+          members: selectedMembers
+        })
+      })
+      .then(response => {
+          if (!response.ok) {
+              // Handle non-successful responses
+              response.text().then(text => alert('Failed to create group: ' + text));
+              return Promise.reject('Server returned non-OK status');
+          }
+          return response.json();
+      })
+      .then(data => {
+        console.log('Group created:', data);
+        hideCreateGroupModal();
+        // For simplicity, we'll reload the page to show the new group
+        window.location.reload();
+      })
+      .catch(error => {
+        console.error('Error creating group:', error);
+        // Alert is done in the .then for non-ok response
+      });
+    }
+
+    function deleteGroup(groupId, groupName) {
+      if (confirm(`Are you sure you want to delete the group "${groupName}"? This action cannot be undone.`)) {
+        fetch(`/chat/groups/${groupId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to delete group');
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Group deleted:', data);
+          // Remove the group from the UI
+          const groupElement = document.querySelector(`[onclick="selectGroup('${groupId}', '${groupName}')"]`).closest('.group-item');
+          if (groupElement) {
+            groupElement.remove();
+          }
+          // If the deleted group was selected, clear the chat
+          if (selectedRecipient && selectedRecipient.id === groupId) {
+            document.getElementById('welcomeMessage').classList.remove('hidden');
+            document.getElementById('chatContainer').classList.add('hidden');
+            document.getElementById('messages').innerHTML = '';
+            selectedRecipient = null;
+            isGroupChat = false;
+          }
+        })
+        .catch(error => {
+          console.error('Error deleting group:', error);
+          alert('Failed to delete group. Please try again.');
+        });
+      }
+    }
+
+  </script>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-white p-6 font-roboto min-h-screen antialiased">
+  <audio id="notification" preload="auto">
+    <source src="/notification/notif.wav" type="audio/wav">
+    <source src="/notification/notif.mp3" type="audio/mpeg">
+    <source src="/notification/notif.ogg" type="audio/ogg">
+  </audio>
+  <div class="container mx-auto bg-white dark:bg-gray-800 shadow-xl rounded-lg p-8 max-w-7xl">
+    <div class="flex justify-between items-center mb-8">
+      <!-- User Profile Element -->
+      <div class="flex items-center gap-3 cursor-pointer group" onclick="showSettingsModal()">
+        <img
+          src="https://api.dicebear.com/7.x/bottts/svg?seed={{user.username}}"
+          alt="Profile"
+          class="w-10 h-10 rounded-full border-2 border-transparent group-hover:border-indigo-500 transition-colors duration-300"
+        />
+        <span class="text-lg font-bold text-gray-800 dark:text-white group-hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300">{{user.username}}</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <button onclick="toggleSidebar()" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white shadow-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-300">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <button onclick="toggleDarkMode()" class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white shadow-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-300">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        </button>
+        <a href="/auth/logout" class="px-4 py-2 bg-red-500 text-white rounded-md shadow-sm hover:bg-red-600 transition-colors duration-300 text-sm" onclick="socket.disconnect()">Logout</a>
+      </div>
+    </div>
+    <div class="flex">
+      <!-- Users/Groups Section -->
+      <div id="sidebar" class="w-1/3 pr-6 border-r border-gray-200 dark:border-gray-700 hidden">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Users</h2>
+          <button onclick="showCreateGroupModal()" class="px-3 py-1 bg-indigo-500 text-white rounded-md shadow-sm hover:bg-indigo-600 transition-colors duration-300 flex items-center gap-1 text-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+            </svg>
+            Create Group
+          </button>
+        </div>
+        <div class="relative mb-6">
+          <input type="text" id="searchUser" placeholder="Search users..." class="w-full p-2 pl-10 rounded-full bg-gray-100 dark:bg-gray-700 border border-transparent focus:border-indigo-500 focus:ring-0 text-gray-900 dark:text-white transition-all duration-300 text-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 absolute left-3 top-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <ul id="userList" class="space-y-2">
+          {{#each users}}
+            <li class="user-item flex items-center p-3 bg-white dark:bg-gray-800 rounded-md shadow-sm hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-all duration-300 border border-transparent hover:border-indigo-500">
+              <img
+                src="https://api.dicebear.com/7.x/bottts/svg?seed={{this.username}}"
+                alt="Profile"
+                class="w-10 h-10 rounded-full shadow-sm"
+              />
+              <div class="ml-4 flex-grow">
+                <a href="#" onclick="selectUser('{{this.id}}', '{{this.username}}')" class="user-name text-base font-semibold text-gray-800 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300">
+                  {{#if (eq this.id ../user.id)}}Me ({{this.username}}){{else}}{{this.username}}{{/if}}
+                </a>
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                  {{#if this.online}}
+                    Online
+                  {{else if this.last_seen}}
+                    Last seen: {{this.last_seen}}
+                  {{else}}
+                    Offline
+                  {{/if}}
+                </p>
+              </div>
+              <span class="w-2 h-2 rounded-full {{#if this.online}}bg-green-500{{else}}bg-gray-400{{/if}} user-status shadow-sm" data-user-id="{{this.id}}"></span>
+            </li>
+          {{/each}}
+        </ul>
+
+        <!-- Groups Section -->
+        <div class="mt-8">
+          <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Groups</h2>
+          <ul id="groupList" class="space-y-2">
+            {{#each groups}}
+              <li class="group-item p-3 bg-white dark:bg-gray-800 rounded-md shadow-sm hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-all duration-300 border border-transparent hover:border-indigo-500" onclick="selectGroup('{{this.id}}', '{{this.name}}')">
+                <div class="flex items-center justify-between">
+                  <h3 class="group-name text-base font-semibold text-gray-800 dark:text-white">{{this.name}}</h3>
+                  {{#if (eq this.created_by ../user.id)}}
+                    <button onclick="event.stopPropagation(); deleteGroup('{{this.id}}', '{{this.name}}')" class="ml-2 p-1 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors duration-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                      </svg>
+                    </button>
+                  {{/if}}
+                </div>
+                {{!-- The server needs to provide the memberCount for this to display correctly --}}
+                <p class="text-sm text-gray-500 dark:text-gray-400">Created by: {{this.creator_name}}</p>
+              </li>
+            {{/each}}
+          </ul>
+        </div>
+      </div>
+      <!-- Chat Section -->
+      <div class="w-full pl-8 flex flex-col">
+        <div id="welcomeMessage" class="text-center text-gray-500 dark:text-gray-400 text-xl font-medium">
+          Welcome, {{user.username}}! Please choose someone to talk to.
+        </div>
+        <div id="chatContainer" class="hidden">
+          <div id="chatHeader" class="flex items-center gap-4 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+            <img
+              id="chatRecipientAvatar"
+              src="https://api.dicebear.com/7.x/bottts/svg?seed=placeholder"
+              alt="Recipient Profile"
+              class="w-10 h-10 rounded-full border-2 border-transparent"
+            />
+            <div>
+              <h2 id="chatRecipientName" class="text-xl font-bold text-gray-800 dark:text-white">Select a chat</h2>
+              <p id="chatRecipientStatus" class="text-sm text-gray-500 dark:text-gray-400"></p>
+            </div>
+          </div>
+          <ul id="messages" class="flex flex-col space-y-3 mb-6 h-[calc(100vh-300px)] overflow-y-auto p-4 border border-gray-200 dark:border-gray-600 rounded-lg relative bg-repeat bg-center" style="background-image: url('https://i.pinimg.com/originals/56/a8/33/56a833fd273e29ecacc4dd928270dc18.png');">
+            <div class="absolute inset-0 bg-black/25 dark:bg-black/45 backdrop-blur-[0.5px]"></div>
+            {{#each messages}}
+              <li class="p-3 mb-2 max-w-xs break-words shadow-sm relative {{#if (eq this.sender_id ../user.id)}}bg-blue-500 text-white self-end ml-auto rounded-lg rounded-br-none{{else}}bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white self-start mr-auto rounded-lg rounded-bl-none{{/if}}">
+                <div class="text-base">{{this.message}}</div>
+                <div class="text-xs mt-1 {{#if (eq this.sender_id ../user.id)}}text-gray-500 dark:text-gray-300{{else}}text-gray-500 dark:text-gray-400{{/if}}">{{this.timestamp}}</div>
+              </li>
+            {{/each}}
+          </ul>
+          <input type="hidden" id="receiverId">
+          <div class="flex items-center gap-4 bg-gray-100 dark:bg-gray-700 p-3 rounded-lg shadow-sm mt-4">
+            <input type="text" id="message" placeholder="Type a message..." class="flex-grow p-2 rounded-md bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-0 text-gray-900 dark:text-white transition-all duration-300">
+            <button onclick="sendMessage()" class="px-5 py-2 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 transition-colors duration-300 flex items-center gap-2">
+              <span>Send</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Create Group Modal -->
+<div id="createGroupModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center z-50">
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-96 transform transition-all duration-300">
+    <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Create New Group</h2>
+    <input type="text" id="groupName" placeholder="Group Name" class="w-full p-2 mb-4 rounded-md bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-0 transition-all duration-300">
+    <div class="mb-6">
+      <h3 class="text-lg font-semibold mb-3 text-gray-900 dark:text-white">Select Members</h3>
+      <div class="max-h-40 overflow-y-auto space-y-2">
+        {{#each users}}
+          {{#unless (eq this.id ../user.id)}}
+            <div class="flex items-center p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-300">
+              <input type="checkbox" id="user-{{this.id}}" value="{{this.id}}" class="w-4 h-4 text-blue-500 rounded border-gray-300 focus:ring-blue-500">
+              <label for="user-{{this.id}}" class="rml-3 text-gray-900 dark:text-white">{{this.username}}</label>
+            </div>
+          {{/unless}}
+        {{/each}}
+      </div>
+    </div>
+    <div class="flex justify-end gap-4">
+      <button onclick="hideCreateGroupModal()" class="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-white rounded-md hover:bg-gray-400 dark:hover:bg-gray-700 transition-colors duration-300 text-sm">Cancel</button>
+      <button onclick="createGroup()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-300 text-sm">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- Profile Settings Modal -->
+<div id="settingsModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center z-50">
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl w-96 transform transition-all duration-300">
+    <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Profile Settings</h2>
+    <div class="mb-4">
+      <label for="settingsUsername" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Username</label>
+      <input type="text" id="settingsUsername" class="mt-1 w-full p-2 rounded-md bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-0 transition-all duration-300" value="{{user.username}}">
+    </div>
+    <div class="mb-4">
+      <label for="settingsOldPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Current Password</label>
+      <input type="password" id="settingsOldPassword" class="mt-1 w-full p-2 rounded-md bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-0 transition-all duration-300" placeholder="Enter your current password to change password">
+    </div>
+    <div class="mb-6">
+      <label for="settingsPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
+      <input type="password" id="settingsPassword" class="mt-1 w-full p-2 rounded-md bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white focus:border-blue-500 focus:ring-0 transition-all duration-300" placeholder="Enter new password (leave blank to keep current)">
+    </div>
+    <div id="settingsMessage" class="mb-4 hidden">
+      <p class="text-sm font-medium"></p>
+    </div>
+    <div class="flex justify-end gap-4">
+      <button onclick="hideSettingsModal()" class="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-white rounded-md hover:bg-gray-400 dark:hover:bg-gray-700 transition-colors duration-300 text-sm">Cancel</button>
+      <button onclick="saveSettings()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-300 text-sm">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const chatSection = document.querySelector('#chatContainer').parentElement; // Get the parent div of chatContainer
+
+    if (sidebar.classList.contains('hidden')) {
+      sidebar.classList.remove('hidden');
+      chatSection.classList.remove('w-full');
+      chatSection.classList.add('w-5/6');
+      chatSection.classList.add('pl-8'); // Add back padding when sidebar is visible
+    } else {
+      sidebar.classList.add('hidden');
+      chatSection.classList.remove('w-5/6');
+      chatSection.classList.add('w-full');
+      chatSection.classList.remove('pl-8'); // Remove padding when sidebar is hidden
+    }
+  }
+
+  function showSettingsModal() {
+    document.getElementById('settingsModal').classList.remove('hidden');
+    document.getElementById('settingsOldPassword').value = '';
+    document.getElementById('settingsPassword').value = '';
+    document.getElementById('settingsMessage').classList.add('hidden');
+  }
+
+  function hideSettingsModal() {
+    document.getElementById('settingsModal').classList.add('hidden');
+  }
+
+  // Placeholder function for saving settings - server-side logic needed
+  function saveSettings() {
+    const newUsername = document.getElementById('settingsUsername').value;
+    const oldPassword = document.getElementById('settingsOldPassword').value;
+    const newPassword = document.getElementById('settingsPassword').value;
+
+    console.log('Attempting to save settings:', { newUsername, oldPassword, newPassword });
+
+    // Basic validation (server-side validation is also crucial)
+    if (newPassword && !oldPassword) {
+        alert('Please enter your current password to change the password.');
+        return;
+    }
+
+    // Create request body
+    const requestBody = {
+        username: newUsername,
+        oldPassword: oldPassword,
+        newPassword: newPassword
+    };
+
+    // Send the request to the server
+    fetch('/auth/update-settings', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => {
+                throw new Error(text || 'Failed to update settings');
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Show success message
+            const messageDiv = document.getElementById('settingsMessage');
+            messageDiv.classList.remove('hidden');
+            messageDiv.classList.add('text-green-600', 'dark:text-green-400');
+            messageDiv.querySelector('p').textContent = 'Settings updated successfully!';
+
+            // Update username in localStorage if it was changed
+            if (newUsername !== localStorage.getItem('username')) {
+                localStorage.setItem('username', newUsername);
+                
+                // Update username in the header
+                const headerUsername = document.querySelector('.group-hover\\:text-indigo-600');
+                if (headerUsername) {
+                    headerUsername.textContent = newUsername;
+                }
+
+                // Update username in the user list
+                const userItems = document.querySelectorAll('.user-item');
+                userItems.forEach(item => {
+                    const usernameElement = item.querySelector('.user-name');
+                    if (usernameElement && usernameElement.textContent.includes('Me')) {
+                        usernameElement.textContent = `Me (${newUsername})`;
+                    }
+                });
+
+                // Update avatar in the header
+                const headerAvatar = document.querySelector('.group-hover\\:border-indigo-500');
+                if (headerAvatar) {
+                    headerAvatar.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${newUsername}`;
+                }
+
+                // Update avatar in the user list
+                const userAvatars = document.querySelectorAll('.user-item img');
+                userAvatars.forEach(avatar => {
+                    if (avatar.alt === 'Profile') {
+                        avatar.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${newUsername}`;
+                    }
+                });
+            }
+
+            // Hide modal after 2 seconds
+            setTimeout(() => {
+                hideSettingsModal();
+            }, 2000);
+        } else {
+            // Show error message
+            const messageDiv = document.getElementById('settingsMessage');
+            messageDiv.classList.remove('hidden');
+            messageDiv.classList.add('text-red-600', 'dark:text-red-400');
+            messageDiv.querySelector('p').textContent = data.message || 'Failed to update settings';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        const messageDiv = document.getElementById('settingsMessage');
+        messageDiv.classList.remove('hidden');
+        messageDiv.classList.add('text-red-600', 'dark:text-red-400');
+        messageDiv.querySelector('p').textContent = error.message || 'An error occurred while updating settings';
+    });
+  }
+</script>
+</body>
+</html>
